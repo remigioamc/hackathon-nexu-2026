@@ -655,6 +655,89 @@
     box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 24px rgba(255,107,107,0.35);
   }
 
+  /* Submissions list */
+  .submissions {
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+  }
+  .submissions-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; gap: 12px; flex-wrap: wrap;
+  }
+  .submissions-head h3 {
+    margin: 0; font-size: 22px; font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .sub-count-pill {
+    padding: 6px 14px; border-radius: 999px;
+    background: rgba(0,240,208,0.10);
+    border: 1px solid rgba(0,240,208,0.35);
+    color: var(--accent);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .submission {
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    transition: all .25s ease;
+    position: relative;
+  }
+  .submission::before {
+    content: ''; position: absolute; left: 0; top: 14px; bottom: 14px;
+    width: 3px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--primary));
+  }
+  .submission:hover { border-color: var(--border-strong); transform: translateX(2px); }
+  .submission-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px; gap: 12px;
+  }
+  .submission-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .18em;
+    color: var(--accent); font-weight: 700;
+  }
+  .submission-time {
+    font-size: 11px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .submission-problem {
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 14px; color: var(--text);
+    line-height: 1.4;
+  }
+  .submission-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px;
+  }
+  @media (max-width: 700px) { .submission-grid { grid-template-columns: 1fr; } }
+  .submission-field { font-size: 13px; }
+  .submission-field .k {
+    display: block;
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 3px; font-weight: 700;
+  }
+  .submission-field .v {
+    color: var(--text); line-height: 1.45;
+  }
+  .submission-field .v.empty { color: var(--muted); font-style: italic; }
+  .submissions-footer {
+    margin-top: 14px; font-size: 12px; color: var(--muted); font-style: italic;
+  }
+  .submission.new {
+    animation: pop-in .5s ease;
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(-12px) scale(.96); }
+    to   { opacity: 1; transform: none; }
+  }
+
   /* Print — clean printable shortlist */
   @media print {
     nav.top, .bg-fx, .grid-overlay, footer.bottom,
@@ -1040,6 +1123,18 @@
         <span class="save-hint"><span class="ok"></span>Auto-saved in-progress · only organizers see submissions</span>
       </div>
     </form>
+
+    <div class="submissions reveal" id="submissionsBlock" style="display:none;">
+      <div class="submissions-head">
+        <h3>Your team's submissions</h3>
+        <span class="sub-count-pill"><span id="subCountText">0</span> · saved</span>
+      </div>
+      <div id="submissionsList"></div>
+      <div class="submissions-footer">
+        This list shows what you've submitted from this browser. The master list lives in the organizers' private sheet.
+      </div>
+    </div>
+
     <div class="toast" id="toast">Saved!</div>
   </div>
 </section>
@@ -1150,7 +1245,7 @@
   // Problem-shortlist form
   (function () {
     const DRAFT_KEY = 'nexu-hackathon-shortlist-draft';
-    const COUNT_KEY = 'nexu-hackathon-shortlist-count';
+    const SUBS_KEY  = 'nexu-hackathon-submissions';
 
     const teamSelect = document.getElementById('teamSelect');
     const fields = {
@@ -1166,6 +1261,9 @@
     const printBtn    = document.getElementById('printBtn');
     const toast       = document.getElementById('toast');
     const countEl     = document.querySelector('#submittedCount .num');
+    const subsBlock   = document.getElementById('submissionsBlock');
+    const subsList    = document.getElementById('submissionsList');
+    const subCountTxt = document.getElementById('subCountText');
     if (!teamSelect || !submitBtn) return;
 
     function showToast(msg, kind) {
@@ -1174,6 +1272,15 @@
       if (kind === 'err') toast.classList.add('err');
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function escapeHtml(s) {
+      return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
     function collect() {
@@ -1201,7 +1308,6 @@
         if (d.team) teamSelect.value = d.team;
         Object.keys(fields).forEach(k => { if (d[k]) fields[k].value = d[k]; });
       } catch (e) {}
-      refreshCount();
     }
 
     function clearCandidateFields() {
@@ -1209,23 +1315,65 @@
       saveDraft();
     }
 
-    function getCount(team) {
-      try {
-        const all = JSON.parse(localStorage.getItem(COUNT_KEY)) || {};
-        return all[team] || 0;
-      } catch (e) { return 0; }
+    function getAllSubmissions() {
+      try { return JSON.parse(localStorage.getItem(SUBS_KEY)) || {}; }
+      catch (e) { return {}; }
     }
 
-    function bumpCount(team) {
-      try {
-        const all = JSON.parse(localStorage.getItem(COUNT_KEY)) || {};
-        all[team] = (all[team] || 0) + 1;
-        localStorage.setItem(COUNT_KEY, JSON.stringify(all));
-      } catch (e) {}
+    function saveAllSubmissions(s) {
+      try { localStorage.setItem(SUBS_KEY, JSON.stringify(s)); } catch (e) {}
     }
 
-    function refreshCount() {
-      countEl.textContent = getCount(teamSelect.value || '');
+    function recordSubmission(data) {
+      const all = getAllSubmissions();
+      if (!all[data.team]) all[data.team] = [];
+      all[data.team].push(Object.assign({}, data, { at: Date.now() }));
+      saveAllSubmissions(all);
+    }
+
+    function teamSubmissions(team) {
+      return (getAllSubmissions()[team] || []);
+    }
+
+    function renderSubmissions(highlightLast) {
+      const team = teamSelect.value;
+      const list = teamSubmissions(team);
+      countEl.textContent = list.length;
+
+      if (!team || list.length === 0) {
+        subsBlock.style.display = 'none';
+        subsList.innerHTML = '';
+        return;
+      }
+
+      subsBlock.style.display = 'block';
+      subsBlock.classList.add('on'); // ensure reveal-animation already fired stays visible
+      subCountTxt.textContent = list.length;
+      subsList.innerHTML = '';
+
+      list.forEach((s, i) => {
+        const isLast = highlightLast && i === list.length - 1;
+        const el = document.createElement('div');
+        el.className = 'submission' + (isLast ? ' new' : '');
+        function field(label, val) {
+          const empty = !val;
+          return '<div class="submission-field"><span class="k">' + label + '</span>'
+               + '<span class="v' + (empty ? ' empty' : '') + '">' + escapeHtml(val || '—') + '</span></div>';
+        }
+        el.innerHTML = ''
+          + '<div class="submission-head">'
+          + '  <span class="submission-num">CANDIDATE ' + String(i + 1).padStart(2, '0') + '</span>'
+          + '  <span class="submission-time">' + formatTime(s.at) + '</span>'
+          + '</div>'
+          + '<div class="submission-problem">' + escapeHtml(s.problem || '—') + '</div>'
+          + '<div class="submission-grid">'
+          +    field('Who feels it',      s.who)
+          +    field('Why AI might help', s.why)
+          +    field('MVP idea',          s.mvp)
+          +    field('Success signal',    s.success)
+          + '</div>';
+        subsList.appendChild(el);
+      });
     }
 
     function validate() {
@@ -1262,11 +1410,16 @@
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload),
         });
-        bumpCount(data.team);
-        refreshCount();
+        recordSubmission(data);
+        renderSubmissions(true);
         showToast('Submitted! Add another candidate ↓');
         clearCandidateFields();
         fields.problem.focus();
+        // Smoothly scroll the new card into view
+        setTimeout(() => {
+          const last = subsList.lastElementChild;
+          if (last) last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
       } catch (err) {
         showToast('Submission failed — check your connection', 'err');
       } finally {
@@ -1291,7 +1444,7 @@
 
     // Listeners
     submitBtn.addEventListener('click', submitToSheet);
-    teamSelect.addEventListener('change', () => { saveDraft(); refreshCount(); });
+    teamSelect.addEventListener('change', () => { saveDraft(); renderSubmissions(false); });
     Object.values(fields).forEach(f => f.addEventListener('input', saveDraft));
     printBtn.addEventListener('click', () => window.print());
 
@@ -1324,6 +1477,7 @@
     });
 
     loadDraft();
+    renderSubmissions(false);
   })();
 </script>
 
