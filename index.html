@@ -456,6 +456,225 @@
   }
   footer.bottom .brand-block strong { color: var(--text); font-weight: 700; }
 
+  /* Teams */
+  .teams-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  @media (max-width: 1000px) { .teams-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px)  { .teams-grid { grid-template-columns: 1fr; } }
+  .team {
+    padding: 24px;
+    border-radius: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all .3s ease;
+    position: relative; overflow: hidden;
+  }
+  .team::before {
+    content: ''; position: absolute; top: -50%; right: -30%;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, var(--team-color, var(--primary)) 0%, transparent 60%);
+    opacity: .18; transition: all .4s ease;
+    pointer-events: none;
+  }
+  .team:hover { transform: translateY(-4px); border-color: var(--border-strong); }
+  .team:hover::before { opacity: .28; transform: scale(1.3); }
+  .team .num-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .team .team-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .18em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .team h3 {
+    margin: 0; font-size: 32px; font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--team-color, var(--primary)), var(--text));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .team .members { display: flex; flex-direction: column; gap: 8px; position: relative; z-index: 1; }
+  .team .member {
+    padding: 9px 12px; border-radius: 9px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    font-size: 14px; font-weight: 500;
+    transition: all .2s ease;
+  }
+  .team:hover .member {
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* Template form */
+  .template-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .template-form .lbl {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+    margin-bottom: 6px; display: block;
+  }
+  .template-form input[type="text"],
+  .template-form textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: inherit; font-size: 14px;
+    transition: border-color .2s, background .2s;
+    resize: vertical;
+  }
+  .template-form input[type="text"]::placeholder,
+  .template-form textarea::placeholder { color: rgba(154,163,194,0.55); }
+  .template-form input[type="text"]:focus,
+  .template-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(0,240,208,0.04);
+  }
+  .template-form textarea { min-height: 62px; }
+  .team-row {
+    display: flex; gap: 16px; align-items: stretch; flex-wrap: wrap;
+  }
+  .select-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%239aa3c2' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    transition: border-color .2s, background-color .2s;
+  }
+  .select-input:focus { outline: none; border-color: var(--accent); }
+  .select-input option { background: var(--bg-soft); color: var(--text); }
+  .submitted-count {
+    align-self: flex-end;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 12px 22px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0,240,208,0.10), rgba(108,139,255,0.10));
+    border: 1px solid var(--border-strong);
+    min-width: 110px;
+  }
+  .submitted-count .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 32px; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .submitted-count .lab {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); margin-top: 4px; font-weight: 700;
+  }
+  .cand-hint {
+    font-size: 12px; color: var(--muted); font-style: italic;
+  }
+  .btn.primary[disabled],
+  .btn[disabled] {
+    opacity: .5; cursor: not-allowed;
+    transform: none !important; box-shadow: none !important;
+  }
+
+  .candidate-block {
+    margin-bottom: 18px;
+    padding: 22px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    position: relative;
+  }
+  .candidate-block .cand-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .candidate-block .cand-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; color: var(--accent);
+    font-size: 13px; letter-spacing: .14em;
+  }
+  .remove-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); padding: 6px 12px;
+    border-radius: 8px; cursor: pointer; font-size: 12px;
+    font-weight: 600; font-family: inherit;
+    transition: all .2s;
+  }
+  .remove-btn:hover { color: #ff6b6b; border-color: #ff6b6b; }
+  .field-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  @media (max-width: 700px) { .field-grid { grid-template-columns: 1fr; } }
+  .field-grid .span-2 { grid-column: 1 / -1; }
+  .form-actions {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    padding-top: 18px; border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .form-actions .save-hint {
+    margin-left: auto; align-self: center;
+    font-size: 12px; color: var(--muted);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .save-hint .ok {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    background: var(--bg-soft);
+    border: 1px solid var(--accent);
+    color: var(--text); padding: 13px 22px;
+    border-radius: 12px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 24px var(--accent-glow);
+    transition: transform .35s cubic-bezier(.2,.8,.2,1);
+    z-index: 100;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.err {
+    border-color: #ff6b6b;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 24px rgba(255,107,107,0.35);
+  }
+
+  /* Print — clean printable shortlist */
+  @media print {
+    nav.top, .bg-fx, .grid-overlay, footer.bottom,
+    header.hero, .stats, #schedule, #tracks, #teams, #scoring,
+    .big-cta, .form-actions, .remove-btn { display: none !important; }
+    body { background: white; color: black; }
+    section.section { padding: 0 !important; }
+    .section-head .kicker { display: none; }
+    .section-head h2 { color: black !important; font-size: 24px; }
+    .section-head p { color: #555; }
+    .template-form { border: 1px solid #ccc; background: white; padding: 12px; }
+    .candidate-block { background: white; border: 1px solid #ccc; break-inside: avoid; page-break-inside: avoid; }
+    .candidate-block .cand-num { color: #444 !important; }
+    .template-form .lbl { color: #444 !important; }
+    .template-form input[type="text"], .template-form textarea {
+      background: white !important; color: black !important;
+      border: 1px solid #ccc !important;
+    }
+  }
+
   /* Reveal animation */
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
   .reveal.on { opacity: 1; transform: none; }
@@ -481,6 +700,8 @@
     <div class="links">
       <a href="#schedule">Schedule</a>
       <a href="#tracks">Tracks</a>
+      <a href="#teams">Teams</a>
+      <a href="#template">Template</a>
       <a href="#scoring">Scoring</a>
       <a href="#awards">Awards</a>
     </div>
@@ -652,6 +873,177 @@
   </div>
 </section>
 
+<section class="section" id="teams">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">// you and yours</div>
+      <h2>Eight teams. Find yours.</h2>
+      <p>Cross-functional by design — every team mixes dev, product, design, BI, data, and AI.</p>
+    </div>
+    <div class="teams-grid">
+
+      <div class="team reveal" style="--team-color: #6c8bff;">
+        <div class="num-row"><span class="team-num">TEAM 01</span></div>
+        <h3>Team 1</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Alejandra Brizio</div>
+          <div class="member">Alejandro Núñez</div>
+          <div class="member">Fernanda Mendoza</div>
+          <div class="member">Alan González</div>
+        </div>
+      </div>
+
+      <div class="team reveal d1" style="--team-color: #00f0d0;">
+        <div class="num-row"><span class="team-num">TEAM 02</span></div>
+        <h3>Team 2</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Baruch Orozco</div>
+          <div class="member">Diego Mora</div>
+          <div class="member">Kevin Caballero</div>
+          <div class="member">Ulises Jaramillo</div>
+        </div>
+      </div>
+
+      <div class="team reveal d2" style="--team-color: #ffcc4d;">
+        <div class="num-row"><span class="team-num">TEAM 03</span></div>
+        <h3>Team 3</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Simon Levy</div>
+          <div class="member">Francisco Anaya</div>
+          <div class="member">Mario Montes</div>
+          <div class="member">Manuel Garay</div>
+        </div>
+      </div>
+
+      <div class="team reveal d3" style="--team-color: #ff5cd6;">
+        <div class="num-row"><span class="team-num">TEAM 04</span></div>
+        <h3>Team 4</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Ana Montoya</div>
+          <div class="member">Kevyn Pérez</div>
+          <div class="member">Alejo Gutierrez</div>
+          <div class="member">Brenda Domínguez</div>
+        </div>
+      </div>
+
+      <div class="team reveal" style="--team-color: #ff9447;">
+        <div class="num-row"><span class="team-num">TEAM 05</span></div>
+        <h3>Team 5</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Yousif Maatouk</div>
+          <div class="member">David Vega</div>
+          <div class="member">Adair Reyes</div>
+          <div class="member">Adrian Torres</div>
+        </div>
+      </div>
+
+      <div class="team reveal d1" style="--team-color: #9d7bff;">
+        <div class="num-row"><span class="team-num">TEAM 06</span></div>
+        <h3>Team 6</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Bruno Gomez</div>
+          <div class="member">Arturo Rodríguez</div>
+          <div class="member">Jorge Escobar</div>
+          <div class="member">Erik Sánchez</div>
+        </div>
+      </div>
+
+      <div class="team reveal d2" style="--team-color: #4dd2ff;">
+        <div class="num-row"><span class="team-num">TEAM 07</span></div>
+        <h3>Team 7</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Paola Morales</div>
+          <div class="member">Rubi Ángeles</div>
+          <div class="member">Alejandro Ruiz</div>
+          <div class="member">Rafael Guzmán</div>
+        </div>
+      </div>
+
+      <div class="team reveal d3" style="--team-color: #4dffa6;">
+        <div class="num-row"><span class="team-num">TEAM 08</span></div>
+        <h3>Team 8</h3>
+        <div class="members" style="margin-top:16px;">
+          <div class="member">Emanuel Alvarado</div>
+          <div class="member">Ángel González</div>
+          <div class="member">César Ascencio</div>
+          <div class="member">Luis Martínez</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="template">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">// brainstorm Mon + Tue</div>
+      <h2>Submit a candidate problem</h2>
+      <p>Fill one candidate at a time and hit submit. Each candidate lands privately in the organizers' Google Sheet — other teams can't see it. Submit as many candidates as you want; the goal is 3–5 per team by Tuesday night.</p>
+    </div>
+    <form class="template-form reveal" id="shortlistForm" onsubmit="return false;">
+      <div class="team-row">
+        <div style="flex:1; min-width: 240px;">
+          <label class="lbl" for="teamSelect">Team</label>
+          <select id="teamSelect" name="team" class="select-input">
+            <option value="">Choose your team…</option>
+            <option value="Team 1">Team 1 — Brizio · Núñez · Mendoza · González</option>
+            <option value="Team 2">Team 2 — Orozco · Mora · Caballero · Jaramillo</option>
+            <option value="Team 3">Team 3 — Levy · Anaya · Montes · Garay</option>
+            <option value="Team 4">Team 4 — Montoya · Pérez · Gutierrez · Domínguez</option>
+            <option value="Team 5">Team 5 — Maatouk · Vega · Reyes · Torres</option>
+            <option value="Team 6">Team 6 — Gomez · Rodríguez · Escobar · Sánchez</option>
+            <option value="Team 7">Team 7 — Morales · Ángeles · Ruiz · Guzmán</option>
+            <option value="Team 8">Team 8 — Alvarado · González · Ascencio · Martínez</option>
+          </select>
+        </div>
+        <div class="submitted-count" id="submittedCount" title="Candidates your team has submitted">
+          <span class="num">0</span>
+          <span class="lab">submitted</span>
+        </div>
+      </div>
+
+      <div class="candidate-block" style="margin-top: 20px;">
+        <div class="cand-head">
+          <div class="cand-num">NEW CANDIDATE</div>
+          <span class="cand-hint">One candidate per submission · add as many as you like</span>
+        </div>
+        <div class="field-grid">
+          <div class="span-2">
+            <label class="lbl">The problem (one sentence)</label>
+            <textarea id="f-problem" data-field="problem" placeholder="What hurts, in one sentence"></textarea>
+          </div>
+          <div>
+            <label class="lbl">Who feels it</label>
+            <textarea id="f-who" data-field="who" placeholder="The role / team / customer segment"></textarea>
+          </div>
+          <div>
+            <label class="lbl">Why AI might help</label>
+            <textarea id="f-why" data-field="why" placeholder="One-sentence hypothesis"></textarea>
+          </div>
+          <div>
+            <label class="lbl">MVP idea</label>
+            <textarea id="f-mvp" data-field="mvp" placeholder="The smallest thing that could prove this works"></textarea>
+          </div>
+          <div>
+            <label class="lbl">Success signal</label>
+            <textarea id="f-success" data-field="success" placeholder="How would we know it worked?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn primary" id="submitBtn">Submit candidate →</button>
+        <button type="button" class="btn ghost" id="copyBtn">Copy as text</button>
+        <button type="button" class="btn ghost" id="downloadBtn">Download .txt</button>
+        <button type="button" class="btn ghost" id="printBtn">Print</button>
+        <span class="save-hint"><span class="ok"></span>Auto-saved in-progress · only organizers see submissions</span>
+      </div>
+    </form>
+    <div class="toast" id="toast">Saved!</div>
+  </div>
+</section>
+
 <section class="section" id="scoring">
   <div class="wrap">
     <div class="section-head reveal">
@@ -746,6 +1138,193 @@
     }
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ============================================================
+  // SUBMISSION CONFIG — paste the deployed Apps Script Web App URL.
+  // Setup instructions: see SETUP_SHEETS.md alongside this file.
+  // Until this is set, the Submit button shows a "not configured" error
+  // and the form still works for Copy / Download / Print fallback.
+  // ============================================================
+  const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz7dR9J0m9aMDTysfV-9KXmVI3xIuLvadhFl0Un-ECjxZusSICtzEUCClmGkP_qsc9v/exec'; // e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
+
+  // Problem-shortlist form
+  (function () {
+    const DRAFT_KEY = 'nexu-hackathon-shortlist-draft';
+    const COUNT_KEY = 'nexu-hackathon-shortlist-count';
+
+    const teamSelect = document.getElementById('teamSelect');
+    const fields = {
+      problem: document.getElementById('f-problem'),
+      who:     document.getElementById('f-who'),
+      why:     document.getElementById('f-why'),
+      mvp:     document.getElementById('f-mvp'),
+      success: document.getElementById('f-success'),
+    };
+    const submitBtn   = document.getElementById('submitBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyBtn     = document.getElementById('copyBtn');
+    const printBtn    = document.getElementById('printBtn');
+    const toast       = document.getElementById('toast');
+    const countEl     = document.querySelector('#submittedCount .num');
+    if (!teamSelect || !submitBtn) return;
+
+    function showToast(msg, kind) {
+      toast.textContent = msg;
+      toast.classList.remove('err');
+      if (kind === 'err') toast.classList.add('err');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function collect() {
+      return {
+        team:    teamSelect.value,
+        problem: fields.problem.value.trim(),
+        who:     fields.who.value.trim(),
+        why:     fields.why.value.trim(),
+        mvp:     fields.mvp.value.trim(),
+        success: fields.success.value.trim(),
+      };
+    }
+
+    function saveDraft() {
+      try {
+        const draft = collect();
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch (e) {}
+    }
+
+    function loadDraft() {
+      try {
+        const d = JSON.parse(localStorage.getItem(DRAFT_KEY));
+        if (!d) return;
+        if (d.team) teamSelect.value = d.team;
+        Object.keys(fields).forEach(k => { if (d[k]) fields[k].value = d[k]; });
+      } catch (e) {}
+      refreshCount();
+    }
+
+    function clearCandidateFields() {
+      Object.values(fields).forEach(f => { f.value = ''; });
+      saveDraft();
+    }
+
+    function getCount(team) {
+      try {
+        const all = JSON.parse(localStorage.getItem(COUNT_KEY)) || {};
+        return all[team] || 0;
+      } catch (e) { return 0; }
+    }
+
+    function bumpCount(team) {
+      try {
+        const all = JSON.parse(localStorage.getItem(COUNT_KEY)) || {};
+        all[team] = (all[team] || 0) + 1;
+        localStorage.setItem(COUNT_KEY, JSON.stringify(all));
+      } catch (e) {}
+    }
+
+    function refreshCount() {
+      countEl.textContent = getCount(teamSelect.value || '');
+    }
+
+    function validate() {
+      const c = collect();
+      if (!c.team) { showToast('Pick your team first', 'err'); teamSelect.focus(); return null; }
+      if (!c.problem) { showToast('At minimum, describe the problem', 'err'); fields.problem.focus(); return null; }
+      return c;
+    }
+
+    async function submitToSheet() {
+      const data = validate();
+      if (!data) return;
+
+      if (!SHEETS_WEBHOOK_URL) {
+        showToast('Submission URL not configured — ask an organizer', 'err');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      const payload = Object.assign({}, data, {
+        submittedAt: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+      });
+
+      try {
+        // Apps Script web apps don't return CORS headers by default.
+        // Using no-cors lets the POST go through; we can't read the response,
+        // so we treat lack of network error as success.
+        await fetch(SHEETS_WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+        bumpCount(data.team);
+        refreshCount();
+        showToast('Submitted! Add another candidate ↓');
+        clearCandidateFields();
+        fields.problem.focus();
+      } catch (err) {
+        showToast('Submission failed — check your connection', 'err');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit candidate →';
+      }
+    }
+
+    function asText() {
+      saveDraft();
+      const c = collect();
+      let out = 'NEXU AI HACKATHON — PROBLEM SHORTLIST CANDIDATE\n';
+      out += 'Team: ' + (c.team || '(no team selected)') + '\n';
+      out += 'Saved: ' + new Date().toLocaleString() + '\n\n';
+      out += 'Problem:           ' + (c.problem || '—') + '\n';
+      out += 'Who feels it:      ' + (c.who     || '—') + '\n';
+      out += 'Why AI might help: ' + (c.why     || '—') + '\n';
+      out += 'MVP idea:          ' + (c.mvp     || '—') + '\n';
+      out += 'Success signal:    ' + (c.success || '—') + '\n';
+      return out;
+    }
+
+    // Listeners
+    submitBtn.addEventListener('click', submitToSheet);
+    teamSelect.addEventListener('change', () => { saveDraft(); refreshCount(); });
+    Object.values(fields).forEach(f => f.addEventListener('input', saveDraft));
+    printBtn.addEventListener('click', () => window.print());
+
+    downloadBtn.addEventListener('click', () => {
+      const text = asText();
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const safe = (collect().team || 'team').replace(/[^\w-]+/g, '-').toLowerCase() || 'team';
+      a.href = url;
+      a.download = 'shortlist-' + safe + '.txt';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      showToast('Downloaded');
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const text = asText();
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('Copied to clipboard');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Copied to clipboard');
+      }
+    });
+
+    loadDraft();
+  })();
 </script>
 
 </body>
