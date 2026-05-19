@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nexu AI Hackathon · Q2 2026</title>
+<meta name="description" content="A day and a half. Eight teams. Six tracks. Build with AI. Ship something real." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #060a18;
+    --bg-soft: #0e1530;
+    --surface: rgba(255,255,255,0.04);
+    --surface-strong: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.10);
+    --border-strong: rgba(255,255,255,0.18);
+    --text: #f3f5fb;
+    --muted: #9aa3c2;
+    --primary: #6c8bff;
+    --primary-glow: #6c8bff80;
+    --accent: #00f0d0;
+    --accent-glow: #00f0d066;
+    --gold: #ffcc4d;
+    --gold-glow: #ffcc4d55;
+    --pink: #ff5cd6;
+    --orange: #ff9447;
+    --max: 1200px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    overflow-x: hidden;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; }
+
+  /* Animated background blobs */
+  .bg-fx {
+    position: fixed; inset: 0; z-index: -1;
+    overflow: hidden; pointer-events: none;
+  }
+  .bg-fx::before, .bg-fx::after {
+    content: ''; position: absolute;
+    border-radius: 50%; filter: blur(120px); opacity: .55;
+    animation: float 22s ease-in-out infinite;
+  }
+  .bg-fx::before {
+    width: 60vw; height: 60vw;
+    background: radial-gradient(circle, var(--primary), transparent 65%);
+    top: -20vw; left: -10vw;
+  }
+  .bg-fx::after {
+    width: 55vw; height: 55vw;
+    background: radial-gradient(circle, var(--accent), transparent 65%);
+    bottom: -20vw; right: -10vw;
+    animation-delay: -11s;
+  }
+  .bg-fx .blob3 {
+    position: absolute; width: 40vw; height: 40vw;
+    border-radius: 50%; filter: blur(140px); opacity: .35;
+    background: radial-gradient(circle, var(--pink), transparent 65%);
+    top: 40vh; left: 40vw;
+    animation: float 28s ease-in-out infinite -7s;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(8vw, -6vw) scale(1.1); }
+    66% { transform: translate(-6vw, 8vw) scale(0.95); }
+  }
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%);
+  }
+
+  /* Layout */
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(6,10,24,0.65);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.top .inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; max-width: var(--max); margin: 0 auto;
+  }
+  nav.top .brand {
+    font-weight: 800; letter-spacing: .02em; font-size: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  nav.top .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+  nav.top .links { display: flex; gap: 22px; font-size: 14px; color: var(--muted); }
+  nav.top .links a { transition: color .2s; }
+  nav.top .links a:hover { color: var(--text); }
+  @media (max-width: 720px) { nav.top .links { display: none; } }
+
+  /* Hero */
+  .hero {
+    padding: 110px 0 80px;
+    position: relative;
+  }
+  .hero .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    font-size: 13px; color: var(--muted);
+    letter-spacing: .08em; text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+  .hero .eyebrow .pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .5; transform: scale(1.35); }
+  }
+  .hero h1 {
+    font-size: clamp(56px, 11vw, 140px);
+    line-height: .95; margin: 0 0 24px;
+    font-weight: 900; letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #ffffff 0%, #b6c6ff 35%, var(--accent) 65%, var(--gold) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 8s linear infinite;
+  }
+  @keyframes shine {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+  }
+  .hero .tagline {
+    font-size: clamp(20px, 2.4vw, 28px);
+    color: var(--muted); max-width: 720px;
+    font-weight: 500; margin: 0 0 36px;
+  }
+  .hero .tagline strong { color: var(--text); font-weight: 700; }
+  .hero .meta {
+    display: flex; flex-wrap: wrap; gap: 14px 28px;
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+  .hero .meta span { display: inline-flex; align-items: center; gap: 8px; }
+  .hero .meta .k { color: var(--accent); }
+  .hero .cta-row { display: flex; flex-wrap: wrap; gap: 14px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 22px; border-radius: 12px;
+    font-weight: 700; font-size: 15px;
+    transition: all .25s ease;
+    cursor: pointer; border: 1px solid transparent;
+  }
+  .btn.primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #0a0f24;
+    box-shadow: 0 8px 32px var(--primary-glow), 0 0 0 1px rgba(255,255,255,0.08) inset;
+  }
+  .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--primary-glow); }
+  .btn.ghost {
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .btn.ghost:hover { background: var(--surface-strong); border-color: var(--accent); }
+
+  /* Stats row */
+  .stats {
+    padding: 40px 0 80px;
+  }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .stat {
+    padding: 28px 24px; border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all .3s ease;
+  }
+  .stat:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    background: var(--surface-strong);
+  }
+  .stat .num {
+    font-size: 44px; font-weight: 900; letter-spacing: -0.02em;
+    line-height: 1; margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat .label { color: var(--muted); font-size: 14px; font-weight: 500; }
+  @media (max-width: 800px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat .num { font-size: 36px; }
+  }
+
+  /* Section primitives */
+  section.section { padding: 100px 0; position: relative; }
+  .section-head { margin-bottom: 56px; max-width: 720px; }
+  .section-head .kicker {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px; font-weight: 700;
+  }
+  .section-head h2 {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800; letter-spacing: -0.025em;
+    line-height: 1.05; margin: 0 0 18px;
+  }
+  .section-head p { color: var(--muted); font-size: 18px; margin: 0; }
+
+  /* Schedule */
+  .schedule-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 900px) { .schedule-grid { grid-template-columns: 1fr; } }
+  .day {
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: all .3s ease;
+  }
+  .day:hover { border-color: var(--border-strong); }
+  .day .head {
+    padding: 28px 28px 24px;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .day .head::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 0%, var(--bg-glow, var(--primary-glow)), transparent 60%);
+    opacity: .8; pointer-events: none;
+  }
+  .day.wed { --bg-glow: var(--primary-glow); }
+  .day.thu { --bg-glow: var(--gold-glow); }
+  .day .head > * { position: relative; z-index: 1; }
+  .day .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .day.wed .label { color: var(--primary); }
+  .day.thu .label { color: var(--gold); }
+  .day h3 {
+    margin: 0 0 6px; font-size: 32px; font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .day .date { color: var(--muted); font-size: 15px; }
+  .day .rows { padding: 12px 8px; }
+  .row {
+    display: grid; grid-template-columns: 110px 1fr;
+    gap: 16px; padding: 14px 20px;
+    border-radius: 10px;
+    align-items: baseline;
+    transition: background .2s;
+  }
+  .row:hover { background: var(--surface-strong); }
+  .row .t {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    color: var(--text); font-size: 14px;
+  }
+  .day.wed .row .t { color: var(--primary); }
+  .day.thu .row .t { color: var(--gold); }
+  .row .b { color: var(--text); font-size: 15px; }
+  .row.hl {
+    background: linear-gradient(90deg, rgba(108,139,255,0.08), transparent);
+    border-left: 2px solid var(--primary);
+  }
+  .day.thu .row.hl {
+    background: linear-gradient(90deg, rgba(255,204,77,0.10), transparent);
+    border-left: 2px solid var(--gold);
+  }
+  .row.hl .b { font-weight: 700; }
+
+  /* Tracks */
+  .tracks-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 1000px) { .tracks-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px)  { .tracks-grid { grid-template-columns: 1fr; } }
+  .track {
+    padding: 28px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: all .35s ease;
+  }
+  .track::after {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--track-color, var(--primary));
+    opacity: .65;
+  }
+  .track::before {
+    content: ''; position: absolute; top: -40%; right: -30%;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, var(--track-color, var(--primary)) 0%, transparent 60%);
+    opacity: .12; transition: all .4s ease;
+    pointer-events: none;
+  }
+  .track:hover { transform: translateY(-6px); border-color: var(--border-strong); }
+  .track:hover::before { transform: scale(1.4); opacity: .22; }
+  .track .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    letter-spacing: .15em; color: var(--track-color, var(--primary));
+    font-weight: 700; margin-bottom: 12px;
+  }
+  .track h3 {
+    margin: 0 0 12px; font-size: 22px; font-weight: 800;
+    letter-spacing: -0.01em; line-height: 1.2;
+  }
+  .track p { margin: 0 0 16px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .track ul {
+    list-style: none; padding: 0; margin: 0;
+    font-size: 13px; color: var(--muted);
+  }
+  .track li {
+    padding-left: 16px; position: relative; margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  .track li::before {
+    content: '→'; position: absolute; left: 0;
+    color: var(--track-color, var(--primary));
+    font-weight: 700;
+  }
+
+  /* Scoring */
+  .scoring {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 24px;
+    align-items: stretch;
+  }
+  @media (max-width: 900px) { .scoring { grid-template-columns: 1fr; } }
+  .scorecard {
+    padding: 32px; border-radius: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+  }
+  .scorecard table {
+    width: 100%; border-collapse: collapse; font-size: 15px;
+  }
+  .scorecard th, .scorecard td {
+    text-align: left; padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .scorecard th {
+    font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .scorecard td.w { color: var(--accent); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .scorecard tr.total td {
+    padding-top: 18px; font-weight: 800;
+    border-bottom: none;
+  }
+  .scorecard tr.total td.w { color: var(--accent); }
+  .scorecard .note {
+    margin-top: 16px; color: var(--muted);
+    font-size: 13px; font-style: italic;
+  }
+
+  .awards-side {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .award {
+    padding: 22px 24px; border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all .25s ease;
+    position: relative; overflow: hidden;
+  }
+  .award:hover { transform: translateX(4px); }
+  .award::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--award-color, var(--primary));
+  }
+  .award .left { display: flex; flex-direction: column; }
+  .award .place {
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .award .name { font-size: 18px; font-weight: 800; margin-top: 2px; }
+  .award .prize {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; font-weight: 700;
+    color: var(--award-color, var(--primary));
+  }
+  .award .sub { font-size: 11px; color: var(--muted); text-align: right; }
+
+  /* Big CTA */
+  .big-cta {
+    margin: 60px 0 0; padding: 56px 40px;
+    border-radius: 24px;
+    background:
+      linear-gradient(135deg, rgba(108,139,255,0.18), rgba(0,240,208,0.12));
+    border: 1px solid var(--border-strong);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .big-cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 50%);
+    opacity: .6; pointer-events: none;
+  }
+  .big-cta > * { position: relative; z-index: 1; }
+  .big-cta h2 {
+    margin: 0 0 14px; font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800; letter-spacing: -0.02em;
+  }
+  .big-cta p {
+    margin: 0 auto 28px; color: var(--muted);
+    font-size: 17px; max-width: 600px;
+  }
+
+  /* Footer */
+  footer.bottom {
+    padding: 60px 0 40px; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 14px;
+  }
+  footer.bottom .inner {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  }
+  footer.bottom .brand-block {
+    display: flex; align-items: center; gap: 12px;
+  }
+  footer.bottom .brand-block .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+  footer.bottom .brand-block strong { color: var(--text); font-weight: 700; }
+
+  /* Reveal animation */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.on { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .08s; }
+  .reveal.d2 { transition-delay: .16s; }
+  .reveal.d3 { transition-delay: .24s; }
+  .reveal.d4 { transition-delay: .32s; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal.on { opacity: 1; transform: none; transition: none; }
+    .bg-fx::before, .bg-fx::after, .bg-fx .blob3 { animation: none; }
+    .hero h1 { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-fx"><div class="blob3"></div></div>
+<div class="grid-overlay"></div>
+
+<nav class="top">
+  <div class="inner">
+    <div class="brand"><span class="dot"></span>Nexu AI Hackathon</div>
+    <div class="links">
+      <a href="#schedule">Schedule</a>
+      <a href="#tracks">Tracks</a>
+      <a href="#scoring">Scoring</a>
+      <a href="#awards">Awards</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow reveal"><span class="pulse"></span>Q2 2026 · In-person · Nexu HQ</div>
+    <h1 class="reveal d1">NEXU AI<br/>HACKATHON</h1>
+    <p class="tagline reveal d2">
+      A day and a half. <strong>Eight teams. Six tracks. One bet:</strong>
+      build something with AI that we'll actually ship.
+    </p>
+    <div class="meta reveal d3">
+      <span><span class="k">when</span> Wed May 20 – Thu May 21, 2026</span>
+      <span><span class="k">prep</span> Mon May 18 + Tue May 19</span>
+      <span><span class="k">where</span> Nexu HQ · in person</span>
+    </div>
+    <div class="cta-row reveal d4">
+      <a href="#schedule" class="btn primary">See the schedule →</a>
+      <a href="#tracks" class="btn ghost">Browse the tracks</a>
+    </div>
+  </div>
+</header>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat reveal"><div class="num">1.5</div><div class="label">days of building</div></div>
+      <div class="stat reveal d1"><div class="num">8</div><div class="label">cross-functional teams</div></div>
+      <div class="stat reveal d2"><div class="num">6</div><div class="label">tracks to choose from</div></div>
+      <div class="stat reveal d3"><div class="num">$17K</div><div class="label">MXN in Amazon cards</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="schedule">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">// the agenda</div>
+      <h2>Two days. Lock scope at 11. Demo at 15.</h2>
+      <p>Wednesday is for building. Thursday is for shipping the demo. Coaches roam both days.</p>
+    </div>
+    <div class="schedule-grid">
+      <div class="day wed reveal">
+        <div class="head">
+          <div class="label">Day 1 · Build</div>
+          <h3>Wednesday May 20</h3>
+          <div class="date">9:00 – 21:00 · scope locks at 11:00</div>
+        </div>
+        <div class="rows">
+          <div class="row"><div class="t">9:00</div><div class="b">Kickoff + breakfast</div></div>
+          <div class="row"><div class="t">9:30</div><div class="b">Team huddle — confirm scope</div></div>
+          <div class="row"><div class="t">10:00</div><div class="b">Architecture + division of labor</div></div>
+          <div class="row hl"><div class="t">11:00</div><div class="b">Scope LOCKED · Build sprint 1</div></div>
+          <div class="row"><div class="t">14:00</div><div class="b">Lunch</div></div>
+          <div class="row"><div class="t">15:00</div><div class="b">Build sprint 2 · coaches on call</div></div>
+          <div class="row"><div class="t">17:00</div><div class="b">Checkpoint — 60s status / team</div></div>
+          <div class="row"><div class="t">17:15</div><div class="b">Build sprint 3</div></div>
+          <div class="row"><div class="t">18:00</div><div class="b">Dinner</div></div>
+          <div class="row hl"><div class="t">19:00</div><div class="b">The last push · Build sprint 4</div></div>
+          <div class="row"><div class="t">21:00</div><div class="b">Go home. Sleep on it.</div></div>
+        </div>
+      </div>
+
+      <div class="day thu reveal d1">
+        <div class="head">
+          <div class="label">Day 2 · Demo</div>
+          <h3>Thursday May 21</h3>
+          <div class="date">9:00 – 17:30 · awards by 17:30</div>
+        </div>
+        <div class="rows">
+          <div class="row"><div class="t">9:00</div><div class="b">Final polish + breakfast</div></div>
+          <div class="row"><div class="t">12:30</div><div class="b">Demo prep · tech check</div></div>
+          <div class="row"><div class="t">14:00</div><div class="b">Lunch</div></div>
+          <div class="row hl"><div class="t">15:00</div><div class="b">DEMOS · 8 teams, 5 min each</div></div>
+          <div class="row"><div class="t">16:30</div><div class="b">Judging deliberation</div></div>
+          <div class="row hl"><div class="t">17:00</div><div class="b">Awards · commitments · photo</div></div>
+          <div class="row"><div class="t">17:30</div><div class="b">We did it.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="tracks">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">// pick one</div>
+      <h2>Six tracks. Every team picks one.</h2>
+      <p>Stretch ideas that span two tracks are fine — declare the primary track for judging.</p>
+    </div>
+    <div class="tracks-grid">
+
+      <div class="track reveal" style="--track-color: #6c8bff;">
+        <div class="num">Track 01</div>
+        <h3>Customer-facing AI</h3>
+        <p>Anything an end customer would directly see or talk to. Strong fit for design-heavy work and UX polish. Synthetic data only.</p>
+        <ul>
+          <li>Conversational onboarding that replaces long forms</li>
+          <li>AI doc-upload coach that critiques photo quality live</li>
+          <li>In-app advisor in plain Spanish, 4–5 questions</li>
+          <li>Voice-first balance check / payment confirmation</li>
+        </ul>
+      </div>
+
+      <div class="track reveal d1" style="--track-color: #00f0d0;">
+        <div class="num">Track 02</div>
+        <h3>Sales &amp; origination ops</h3>
+        <p>AI that makes sales and credit teams dramatically faster. Strong fit for teams comfortable with messy real-world inputs.</p>
+        <ul>
+          <li>One-page underwriting summary from the full doc set</li>
+          <li>KYC pre-check copilot — what's missing before they leave</li>
+          <li>Lead-scoring agent from intake transcripts</li>
+          <li>Voice-to-CRM: structured notes, follow-ups, tags</li>
+        </ul>
+      </div>
+
+      <div class="track reveal d2" style="--track-color: #ffcc4d;">
+        <div class="num">Track 03</div>
+        <h3>Internal productivity copilots</h3>
+        <p>AI tools for Nexu employees doing day-to-day work. Lowest data-sensitivity track — great fit for teams that want to ship something usable fast.</p>
+        <ul>
+          <li>Internal docs Q&amp;A with citations</li>
+          <li>Meeting summarizer with action items + owners</li>
+          <li>Auto-generated weekly team digest</li>
+          <li>Doc drafter for RFCs, post-mortems, project briefs</li>
+        </ul>
+      </div>
+
+      <div class="track reveal" style="--track-color: #ff5cd6;">
+        <div class="num">Track 04</div>
+        <h3>Risk, credit &amp; fraud</h3>
+        <p>The heart of Nexu's business model. Highest-impact and highest-skill. Strong fit for data + AI + BI talent. Synthetic underwriting data only.</p>
+        <ul>
+          <li>Fraud-pattern detector across application clusters</li>
+          <li>Anomaly watchdog on portfolio metrics</li>
+          <li>Document-tampering detector for IDs and pay stubs</li>
+          <li>Early-warning model for delinquency + draft outreach</li>
+        </ul>
+      </div>
+
+      <div class="track reveal d1" style="--track-color: #ff9447;">
+        <div class="num">Track 05</div>
+        <h3>Data &amp; BI automation</h3>
+        <p>Make the data team's outputs faster, richer, accessible. Remove the bottleneck where the rest of the company waits for data.</p>
+        <ul>
+          <li>Natural-language SQL with chart + visible query</li>
+          <li>Auto-narrated dashboards — what changed and why</li>
+          <li>Metric anomaly explainer with hypotheses</li>
+          <li>“Data dictionary” agent answering provenance questions</li>
+        </ul>
+      </div>
+
+      <div class="track reveal d2" style="--track-color: #6c8bff;">
+        <div class="num">Track 06</div>
+        <h3>Design &amp; content AI</h3>
+        <p>How Nexu creates, communicates, tests its product and brand. Strong fit for designer- and marketer-led teams.</p>
+        <ul>
+          <li>Marketing-asset pipeline from a single brief</li>
+          <li>UX-research synthesizer over 20 interview transcripts</li>
+          <li>Design-system copilot respecting tokens</li>
+          <li>Brand-consistency checker on drafts and screens</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="scoring">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">// how you win</div>
+      <h2>Four criteria. One scorecard. No drama.</h2>
+      <p>Each judge fills the card for every team. Your final score is the average of judges' weighted totals.</p>
+    </div>
+    <div class="scoring">
+      <div class="scorecard reveal">
+        <table>
+          <thead>
+            <tr><th>Criterion</th><th>Weight</th><th>Score (1–10)</th><th>Weighted</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Business impact / problem fit</td><td class="w">30%</td><td>—</td><td>—</td></tr>
+            <tr><td>Use of AI — depth &amp; craft</td><td class="w">25%</td><td>—</td><td>—</td></tr>
+            <tr><td>Feasibility / path to production</td><td class="w">25%</td><td>—</td><td>—</td></tr>
+            <tr><td>Demo quality &amp; UX</td><td class="w">20%</td><td>—</td><td>—</td></tr>
+            <tr class="total"><td>Total</td><td class="w">100%</td><td></td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="note">Rankings determine 1st, 2nd, 3rd. Best Use of AI is a special category — it can also win a placement.</div>
+      </div>
+
+      <div class="awards-side" id="awards">
+        <div class="award reveal d1" style="--award-color: #ffcc4d;">
+          <div class="left">
+            <div class="place">1st place</div>
+            <div class="name">Champion</div>
+          </div>
+          <div>
+            <div class="prize">$8,000 MXN</div>
+            <div class="sub">per person · Amazon</div>
+          </div>
+        </div>
+        <div class="award reveal d2" style="--award-color: #c5cad3;">
+          <div class="left">
+            <div class="place">2nd place</div>
+            <div class="name">Runner-up</div>
+          </div>
+          <div>
+            <div class="prize">$5,000 MXN</div>
+            <div class="sub">per person · Amazon</div>
+          </div>
+        </div>
+        <div class="award reveal d3" style="--award-color: #d68b59;">
+          <div class="left">
+            <div class="place">3rd place</div>
+            <div class="name">Bronze</div>
+          </div>
+          <div>
+            <div class="prize">$3,000 MXN</div>
+            <div class="sub">per person · Amazon</div>
+          </div>
+        </div>
+        <div class="award reveal d4" style="--award-color: #00f0d0;">
+          <div class="left">
+            <div class="place">special</div>
+            <div class="name">Best Use of AI</div>
+          </div>
+          <div>
+            <div class="prize">$1,000 MXN</div>
+            <div class="sub">per person · Amazon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="big-cta reveal">
+      <h2>Winning ideas don't die in the slide deck.</h2>
+      <p>The top 3 ideas get a named owner from leadership, a 4–6 week target to ship a v1, a small dedicated team, and a budget line for tooling and API spend.</p>
+      <a href="#schedule" class="btn primary">Let's build it →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="bottom">
+  <div class="wrap inner">
+    <div class="brand-block"><span class="dot"></span><strong>Nexu AI Hackathon</strong> · Q2 2026</div>
+    <div>Prep Mon May 18 + Tue May 19 · AI tooling session Tuesday afternoon · Bring caffeine and ideas.</div>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('on');
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
